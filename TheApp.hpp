@@ -21,6 +21,25 @@
 class TheApp : public CApp
 {
 public:
+	//
+	// Types.
+	//
+
+	//! The modified settings flags.
+	enum Settings
+	{
+		IGNORE_LIST		= 0x0001,	//!< The list of settings to ignore.
+		BUILDDEP_LIST	= 0x0002,	//!< The list of build dependent settings.
+	};
+
+	//! The type of action.
+	enum Action
+	{
+		LIST_SETTINGS		= 1,	//!< List the project settings.
+		COMPARE_SETTINGS	= 2,	//!< Compare the project settings.
+	};
+
+public:
 	//! Constructor.
 	TheApp();
 
@@ -30,16 +49,27 @@ public:
 	//
 	// Public members.
 	//
-	AppWnd		m_oAppWnd;		//!< The main window.
-	AppCmds		m_oAppCmds;		//!< The command handler.
+	AppWnd			m_appWnd;			//!< The main window.
+	AppCmds			m_appCmds;			//!< The command handler.
 
 	//
 	// Application settings.
 	//
-	CRect		m_rcLastPos;		//!< Main window previous position.
-	CPath		m_strLastFolder;	//!< The last folder to be compared.
-	CPath		m_strLastFile1;		//!< The last file to be compared.
-	CPath		m_strLastFile2;		//!< The last file to be compared
+	uint			m_modified;			//!< Bitmask of modified settings.
+	CRect			m_lastWndPos;		//!< Main window previous position.
+	tstring			m_lastFolder;		//!< The last folder to be compared.
+	tstring			m_lastFile1;		//!< The last file to be compared.
+	tstring			m_lastFile2;		//!< The last file to be compared
+	ToolSettings	m_ignoreList;		//!< The settings to be ignored when comparing.
+	ToolSettings	m_buildDepList;		//!< The settings that are build dependent.
+
+	//
+	// Application Data.
+	//
+	Action			m_action;			//!< The last action performed.
+	Projects        m_projects;			//!< The project files scanned.
+	ProjectSettings m_settings;			//!< The parsed project files.
+	Table			m_results;			//!< The comparison results.
 
 private:
 	//
@@ -57,20 +87,13 @@ private:
 	//
 
 	//! Load the application settings.
-	void LoadConfig();
+	void loadConfig();
 
 	//! Save the application settings.
-	void SaveConfig();
-
-	//
-	// Constants.
-	//
-
-	//! The .ini file format version number.
-	static const tchar* INI_FILE_VER;
+	void saveConfig();
 };
 
 //! The application singleton instance.
-extern TheApp App;
+extern TheApp g_app;
 
 #endif // APP_THEAPP_HPP

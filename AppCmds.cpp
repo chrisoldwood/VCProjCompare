@@ -7,9 +7,10 @@
 #include "AppCmds.hpp"
 #include "TheApp.hpp"
 #include "AboutDlg.hpp"
-//#include <WCL/BusyCursor.hpp>
 #include "ProgressDlg.hpp"
-#include <WCL/FolderIterator.hpp>
+#include "FileListDlg.hpp"
+#include <WCL/BusyCursor.hpp>
+#include "OptionsDlg.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Constructor.
@@ -19,9 +20,15 @@ AppCmds::AppCmds()
 	// Define the command table.
 	DEFINE_CMD_TABLE
 		// File menu.
-		CMD_ENTRY(ID_FILE_EXIT,		&AppCmds::OnFileExit,	NULL,	-1)
+		CMD_ENTRY(ID_FILE_LIST,		&AppCmds::onFileList,		NULL,	-1)
+		CMD_ENTRY(ID_FILE_COMPARE,	&AppCmds::onFileCompare,	NULL,	-1)
+		CMD_ENTRY(ID_FILE_REFRESH,	&AppCmds::onFileRefresh,	NULL,	-1)
+		CMD_ENTRY(ID_FILE_EXIT,		&AppCmds::onFileExit,		NULL,	-1)
+		// Tools menu.
+		CMD_ENTRY(ID_TOOLS_OPTIONS,	&AppCmds::onToolsOptions,	NULL,	-1)
 		// Help menu.
-		CMD_ENTRY(ID_HELP_ABOUT,	&AppCmds::OnHelpAbout,	NULL,	 2)
+		CMD_ENTRY(ID_HELP_CONTENTS,	&AppCmds::onHelpContents,	NULL,	-1)
+		CMD_ENTRY(ID_HELP_ABOUT,	&AppCmds::onHelpAbout,		NULL,	-1)
 	END_CMD_TABLE
 }
 
@@ -33,96 +40,195 @@ AppCmds::~AppCmds()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Close the application.
+//! List the raw project settings.
 
-void AppCmds::OnFileExit()
+void AppCmds::onFileList()
 {
-	App.m_oAppWnd.Close();
+	CBusyCursor busyCursor;
+
+	// Clear all existing data.
+	g_app.m_projects.clear();
+	g_app.m_settings.clear();
+	g_app.m_results.clear();
+	g_app.m_action = TheApp::LIST_SETTINGS;
+
+	// Generate the project settings data.
+	if (!doFindAndParseFiles(g_app.m_projects, g_app.m_settings))
+		return;
+
+	// Display the raw results.
+	listSettings(g_app.m_projects, g_app.m_settings, g_app.m_results);
+
+	g_app.m_appWnd.m_mainView.displayResults(g_app.m_results);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Compare the files.
+//! Compare the files for differences.
 
-void AppCmds::OnFileCompare()
+void AppCmds::onFileCompare()
 {
-	AppDlg& dlgMain = App.m_oAppWnd.m_oAppDlg;
+	CBusyCursor busyCursor;
 
-	try
+	// Clear all existing data.
+	g_app.m_projects.clear();
+	g_app.m_settings.clear();
+	g_app.m_results.clear();
+	g_app.m_action = TheApp::COMPARE_SETTINGS;
+
+	// Generate the project settings data.
+	if (!doFindAndParseFiles(g_app.m_projects, g_app.m_settings))
+		return;
+
+	// Compare and display the results.
+	compareSettings(g_app.m_projects, g_app.m_settings, g_app.m_results);
+
+	g_app.m_appWnd.m_mainView.displayResults(g_app.m_results);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Rescan the project files.
+
+void AppCmds::onFileRefresh()
+{
+	CBusyCursor busyCursor;
+
+	// Clear existing result data.
+	g_app.m_settings.clear();
+	g_app.m_results.clear();
+
+	// Generate the project settings data.
+	if (!doFindAndParseFiles(g_app.m_projects, g_app.m_settings))
+		return;
+
+	// Process the results according to the previous action.
+	if (g_app.m_action == TheApp::LIST_SETTINGS)
 	{
-		ProgressDlg dlgProgress(App.m_oAppWnd);	
-		FileList	vecFiles;
-
-		dlgProgress.UpdateProgressBar(0);
-		dlgProgress.SetStatus(TXT("Searching for project files..."));
-
-		// Comparing all files?
-		if (dlgMain.m_rbFolder.IsChecked())
-		{
-			CPath strFolder = dlgMain.m_ebPath1.Text();
-
-			FindProjectFiles(strFolder, vecFiles);
-
-			// Remember the folder.
-			App.m_strLastFolder = strFolder;
-		}
-		// Comparing just two files.
-		else
-		{
-			CPath strFile1 = dlgMain.m_ebPath1.Text();
-			CPath strFile2 = dlgMain.m_ebPath2.Text();
-
-			vecFiles.push_back(tstring(strFile1));
-			vecFiles.push_back(tstring(strFile2));
-
-			// Remember the files.
-			App.m_strLastFile1 = strFile1;
-			App.m_strLastFile2 = strFile2;
-		}
-/*
-		// Nothing to do?
-		if (vecFiles.size() < 2)
-		{
-			App.NotifyMsg(TXT("Not enough files found for a comparison"));
-			return;
-		}
-*/
-		dlgProgress.UpdateProgressBar(1);
-		dlgProgress.SetStatus(TXT("Reading project files..."));
-
-		// Read in the project files.
-		for (FileList::const_iterator it = vecFiles.begin(); it != vecFiles.end(); ++it)
-			TRACE1(TXT("%s\n"), it->c_str());
-
-		dlgProgress.UpdateProgressBar(2);
-		dlgProgress.SetStatus(TXT("Comparing project files..."));
-
-		// Do the comparison.
-
-		dlgProgress.UpdateProgressBar(3);
+		listSettings(g_app.m_projects, g_app.m_settings, g_app.m_results);
 	}
-	catch(const Core::Exception& e)
+	else // (g_app.m_action == TheApp::COMPARE_SETTINGS)
 	{
-		App.FatalMsg(TXT("Failed to compare the project files:-\n\n%s"), e.What());
+		compareSettings(g_app.m_projects, g_app.m_settings, g_app.m_results);
 	}
+
+	g_app.m_appWnd.m_mainView.displayResults(g_app.m_results);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Close the application.
+
+void AppCmds::onFileExit()
+{
+	g_app.m_appWnd.Close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Show the application settings dialog.
+
+void AppCmds::onToolsOptions()
+{
+	OptionsDlg options;
+
+	options.RunModal(g_app.m_appWnd);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Show the HelpFile.
+
+void AppCmds::onHelpContents()
+{
+	CBusyCursor busyCursor;
+
+	::ShellExecute(NULL, NULL, CPath::ApplicationDir() / TXT("VCProjCompare.mht"), NULL, NULL, SW_SHOW);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Show the about dialog.
 
-void AppCmds::OnHelpAbout()
+void AppCmds::onHelpAbout()
 {
-	AboutDlg Dlg;
+	AboutDlg dialog;
 
-	Dlg.RunModal(App.m_oAppWnd);
+	dialog.RunModal(g_app.m_appWnd);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Find all project files.
+//! Find and parse the project files into an internal form.
 
-void AppCmds::FindProjectFiles(const CPath& strFolder, FileList& vecFiles)
+bool AppCmds::doFindAndParseFiles(Projects& projects, ProjectSettings& settings)
 {
-	WCL::FolderIterator end;
+	AppDlg& view = g_app.m_appWnd.m_mainView;
 
-	for (WCL::FolderIterator it(tstring(strFolder), TXT("*.vcproj")); it != end; ++it)
-		vecFiles.push_back(tstring(strFolder / *it));
+	// Initialise progress UI.
+	ProgressDlg progress(g_app.m_appWnd);	
+
+	progress.updateProgressBar(0);
+	progress.setStatus(TXT("Searching for project files..."));
+
+	// Not doing a rescan?
+	if (projects.empty())
+	{
+		// Comparing all files?
+		if (view.isFolderScanSelected())
+		{
+			tstring  folder = view.getPath1();
+			FileList files;
+
+			// Search folder for all project files.
+			if (!findProjectFiles(folder, files))
+				return false;
+
+			if (files.empty())
+			{
+				g_app.AlertMsg(TXT("No project files were found"));
+				return false;
+			}
+
+			// Allow user to edit the file list.
+			FileListDlg fileListDlg;
+
+			fileListDlg.m_files = files;
+
+			if (fileListDlg.RunModal(g_app.m_appWnd) != IDOK)
+				return false;
+
+			// Create project file list.
+			for (FileList::const_iterator it = fileListDlg.m_files.begin(); it != fileListDlg.m_files.end(); ++it)
+				projects.push_back(ProjectFile(*it));
+
+			// Remember the folder.
+			g_app.m_lastFolder = folder;
+		}
+		// Comparing just two specific files.
+		else
+		{
+			tstring file1 = view.getPath1();
+			tstring file2 = view.getPath2();
+
+			// Create project file list.
+			projects.push_back(ProjectFile(file1));
+			projects.push_back(ProjectFile(file2));
+
+			// Remember the files.
+			g_app.m_lastFile1 = file1;
+			g_app.m_lastFile2 = file2;
+		}
+	}
+
+	progress.updateProgressBar(2);
+	progress.setStatus(TXT("Reading project files..."));
+
+	// Load the project files.
+	if (!readProjectFiles(projects))
+		return false;
+
+	progress.updateProgressBar(4);
+	progress.setStatus(TXT("Parsing project files..."));
+
+	// Parse the project files.
+	if (!parseProjectFiles(projects, settings))
+		return false;
+
+	progress.updateProgressBar(5);
+
+	return true;
 }
