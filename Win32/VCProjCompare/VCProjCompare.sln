@@ -20,21 +20,24 @@ Global
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
 	EndGlobalSection
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 5
 		SccProjectUniqueName0 = ..\\Lib\\Core\\Core.vcproj
 		SccProjectName0 = \u0022$/Win32/Lib/Core\u0022,\u0020QWDAAAAA
 		SccLocalPath0 = ..\\Lib\\Core
-		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
 		CanCheckoutShared = true
 		SccProjectUniqueName1 = ..\\Lib\\WCL\\Wcl.vcproj
 		SccProjectName1 = \u0022$/Win32/Lib/WCL\u0022,\u0020HPAAAAAA
 		SccLocalPath1 = ..\\Lib\\WCL
-		SccProvider1 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
 		CanCheckoutShared = true
 		SccProjectUniqueName2 = ..\\Lib\\XML\\XML.vcproj
 		SccProjectName2 = \u0022$/Win32/Lib/XML\u0022,\u0020RWDAAAAA
 		SccLocalPath2 = ..\\Lib\\XML
-		SccProvider2 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		CanCheckoutShared = true
+		SccLocalPath3 = .
+		CanCheckoutShared = true
+		SolutionUniqueID = {6FDD09A1-1CC4-4348-89E3-7B0854E5155F}
+		SccProjectUniqueName4 = VCProjCompare.vcproj
+		SccLocalPath4 = .
 		CanCheckoutShared = true
 	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
