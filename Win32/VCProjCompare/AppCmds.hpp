@@ -12,9 +12,8 @@
 #endif
 
 #include <WCL/CmdCtrl.hpp>
-
-// Forward declarations.
-class CPath;
+#include <XML/Document.hpp>
+#include "ProjectCompare.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 //! The application command controller.
@@ -32,29 +31,38 @@ public:
 	// Commands.
 	//
 
-	//! Close the application.
-	void OnFileExit();
+	//! List the raw project settings.
+	void onFileList();
 
-	//! Compare the files.
-	void OnFileCompare();
+	//! Compare the files for differences.
+	void onFileCompare();
+
+	//! Rescan the project files.
+	void onFileRefresh();
+
+	//! Close the application.
+	void onFileExit();
+
+	//! Show the application settings dialog.
+	void onToolsOptions();
+
+	//! Show the HelpFile.
+	void onHelpContents();
 
 	//! Show the about dialog.
-	void OnHelpAbout();
+	void onHelpAbout();
 
 	//
 	// UI handlers.
 	//
 
 private:
-	//! The collection of filenames.
-	typedef std::vector<tstring> FileList;
-
 	//
 	// Internal methods.
 	//
 
-	//! Find all project files.
-	void FindProjectFiles(const CPath& strFolder, FileList& vecFiles);
+	//! Find and parse the project files into an internal form.
+	static bool doFindAndParseFiles(Projects& projects, ProjectSettings& settings);
 };
 
 #endif // APP_APPCMDS_HPP

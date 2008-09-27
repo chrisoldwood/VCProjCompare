@@ -13,6 +13,7 @@
 
 #include <WCL/MainDlg.hpp>
 #include <WCL/CommonUI.hpp>
+#include "ProjectCompare.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 //! The application main dialog. This is the dialog that sits in the centre of
@@ -28,17 +29,34 @@ public:
 	virtual ~AppDlg();
 
 	//
-	// Controls
+	// Methods.
 	//
-	CRadioBtn	m_rbFolder;		//!< Radio button to signal folder comparison.
-	CRadioBtn	m_rbFiles;		//!< Radio button to signal file comparison.
-	CLabel		m_txtPath1;		//!< The first path type label.
-	CEditBox	m_ebPath1;		//!< The edit box for the first path.
-	CLabel		m_txtPath2;		//!< The second path type label.
-	CEditBox	m_ebPath2;		//!< The edit box for the second path.
-	CListView	m_lvResults;	//!< The list view for the results.
+
+	//! Query if the user wants to scan folders.
+	bool isFolderScanSelected() const;
+
+	//! Get the 1st path.
+	tstring getPath1() const;
+
+	//! Get the 2nd path.
+	tstring getPath2() const;
+
+	//! Display the results list.
+	void displayResults(Table& results);
 
 private:
+	//
+	// Controls
+	//
+	CRadioBtn	m_folderButton;	//!< Radio button to signal folder comparison.
+	CRadioBtn	m_filesButton;	//!< Radio button to signal file comparison.
+	CLabel		m_path1Label;	//!< The first path type label.
+	CEditBox	m_path1Editor;	//!< The edit box for the first path.
+	CLabel		m_path2Label;	//!< The second path type label.
+	CEditBox	m_path2Editor;	//!< The edit box for the second path.
+	CListView	m_resultsView;	//!< The list view for the results.
+	CFont		m_resultsFont;	//!< The font to use for the results view.
+
 	//
 	// Message processors.
 	//
@@ -46,30 +64,30 @@ private:
 	//! Handle dialog creation.
 	virtual void OnInitDialog();
 
-	//! The path browse button has been pressed.
-	void OnBrowsePath1();
+	//! Browse for the 1st path.
+	void onBrowsePath1();
 
-	//! The path browse button has been pressed.
-	void OnBrowsePath2();
+	//! Browse for the 2nd path.
+	void onBrowsePath2();
 
-	//! The button to select comparison of all files has been pressed.
-	void OnSelectCompareAll();
+	//! Switch to comparing files in a folder.
+	void onFolderComparison();
 
-	//! The button to select comparison of two files has been pressed.
-	void OnSelectCompareFiles();
+	//! Switch to comparing specifc files.
+	void onFileComparison();
 
-	//! Run the comparison.
-	void OnCompare();
+	//! Show a context menu for the selected result.
+	LRESULT onRightClickResult(NMHDR& event);
 
 	//
 	// Internal methods.
 	//
 
 	//! Browse for a folder path.
-	void BrowseForFolder(CEditBox& ebPath);
+	void browseForFolder(CEditBox& pathEditor);
 
 	//! Browse for a file path.
-	void BrowseForFile(CEditBox& ebPath);
+	void browseForFile(CEditBox& pathEditor);
 };
 
 #endif // APP_APPDLG_HPP

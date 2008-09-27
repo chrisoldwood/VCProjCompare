@@ -6,27 +6,33 @@
 #include "Common.hpp"
 #include "TheApp.hpp"
 #include <WCL/IniFile.hpp>
+#include <Core/StringUtils.hpp>
+#include <WCL/StrTok.hpp>
+#include <WCL/StrArray.hpp>
+#include <WCL/BusyCursor.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global variables.
 
 //! The application singleton instance.
-TheApp App;
+TheApp g_app;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constants.
 
 //! The .ini file format version number.
-const tchar* TheApp::INI_FILE_VER = TXT("1.0");
+const tchar* INI_FILE_VER = TXT("1.0");
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Constructor.
 
 TheApp::TheApp()
-	: CApp(m_oAppWnd, m_oAppCmds)
-	, m_strLastFolder()
-	, m_strLastFile1()
-	, m_strLastFile2()
+	: CApp(m_appWnd, m_appCmds)
+	, m_modified(0)
+	, m_lastFolder()
+	, m_lastFile1()
+	, m_lastFile2()
+	, m_action(LIST_SETTINGS)
 {
 
 }
@@ -45,28 +51,28 @@ TheApp::~TheApp()
 bool TheApp::OnOpen()
 {
 	// These cannot be initialised in the ctor.
-	m_strLastFolder = CPath::ApplicationDir();
-	m_strLastFile1 = CPath::ApplicationDir();
-	m_strLastFile2 = CPath::ApplicationDir();
+	m_lastFolder = CPath::ApplicationDir();
+	m_lastFile1 = CPath::ApplicationDir();
+	m_lastFile2 = CPath::ApplicationDir();
 
 	// Set the app title.
 	m_strTitle = TXT("Visual C++ Project Compare");
 
 	// Load settings.
-	LoadConfig();
+	loadConfig();
 	
 	// Create the main window.
-	if (!m_oAppWnd.Create())
+	if (!m_appWnd.Create())
 		return false;
 
 	// Show it.
-	if (ShowNormal() && !m_rcLastPos.Empty())
-		m_oAppWnd.Move(m_rcLastPos);
+	if (ShowNormal() && !m_lastWndPos.Empty())
+		m_appWnd.Move(m_lastWndPos);
 
-	m_oAppWnd.Show(m_iCmdShow);
+	m_appWnd.Show(m_iCmdShow);
 
 	// Update UI.
-	m_oAppCmds.UpdateUI();
+	m_appCmds.UpdateUI();
 
 	return true;
 }
@@ -77,7 +83,7 @@ bool TheApp::OnOpen()
 bool TheApp::OnClose()
 {
 	// Save settings.
-	SaveConfig();
+	saveConfig();
 
 	return true;
 }
@@ -85,33 +91,103 @@ bool TheApp::OnClose()
 ////////////////////////////////////////////////////////////////////////////////
 //! Load the application settings.
 
-void TheApp::LoadConfig()
+void TheApp::loadConfig()
 {
-	CIniFile oIniFile;
+	CIniFile    iniFile;
+	CBusyCursor busyCursor;
 
 	// Read the file version.
-	CString strVer = oIniFile.ReadString(TXT("Version"), TXT("Version"), INI_FILE_VER);
+	tstring version = iniFile.ReadString(TXT("Version"), TXT("Version"), INI_FILE_VER);
 
 	// Read the UI settings.
-	m_rcLastPos     = oIniFile.ReadRect  (TXT("UI"), TXT("MainWindow"), m_rcLastPos);
-	m_strLastFolder = oIniFile.ReadString(TXT("UI"), TXT("LastFolder"), m_strLastFolder);
-	m_strLastFile1  = oIniFile.ReadString(TXT("UI"), TXT("LastFile1"),  m_strLastFile1);
-	m_strLastFile2  = oIniFile.ReadString(TXT("UI"), TXT("LastFile2"),  m_strLastFile2);
+	m_lastWndPos = iniFile.ReadRect  (TXT("UI"), TXT("MainWindow"), m_lastWndPos);
+	m_lastFolder = iniFile.ReadString(TXT("UI"), TXT("LastFolder"), m_lastFolder);
+	m_lastFile1  = iniFile.ReadString(TXT("UI"), TXT("LastFile1"),  m_lastFile1);
+	m_lastFile2  = iniFile.ReadString(TXT("UI"), TXT("LastFile2"),  m_lastFile2);
+
+	// Read the ignored settings list.
+	size_t count = iniFile.ReadUInt(TXT("Ignore"), TXT("Count"), 0);
+
+	for (size_t i = 0; i != count; ++i)
+	{
+		tstring entry = Core::Fmt(TXT("Item[%u]"), i);
+		tstring value = iniFile.ReadString(TXT("Ignore"), entry.c_str(), tstring());
+
+		CStrArray fields;
+
+		if (CStrTok::Split(value.c_str(), TXT(','), fields) != 2)
+			continue;
+
+		m_ignoreList.insert(ToolSetting(tstring(fields[0]), tstring(fields[1])));
+	}
+
+	// Read the build dependent settings list.
+	count = iniFile.ReadUInt(TXT("Build Dependent"), TXT("Count"), 0);
+
+	for (size_t i = 0; i != count; ++i)
+	{
+		tstring entry = Core::Fmt(TXT("Item[%u]"), i);
+		tstring value = iniFile.ReadString(TXT("Build Dependent"), entry.c_str(), tstring());
+
+		CStrArray fields;
+
+		if (CStrTok::Split(value.c_str(), TXT(','), fields) != 2)
+			continue;
+
+		m_buildDepList.insert(ToolSetting(tstring(fields[0]), tstring(fields[1])));
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Save the application settings.
 
-void TheApp::SaveConfig()
+void TheApp::saveConfig()
 {
-	CIniFile oIniFile;
+	CIniFile    iniFile;
+	CBusyCursor busyCursor;
 
 	// Write the file version.
-	oIniFile.WriteString(TXT("Version"), TXT("Version"), INI_FILE_VER);
+	iniFile.WriteString(TXT("Version"), TXT("Version"), INI_FILE_VER);
 
 	// Write the UI settings.
-	oIniFile.WriteRect  (TXT("UI"), TXT("MainWindow"), m_rcLastPos);
-	oIniFile.WriteString(TXT("UI"), TXT("LastFolder"), m_strLastFolder);
-	oIniFile.WriteString(TXT("UI"), TXT("LastFile1"),  m_strLastFile1);
-	oIniFile.WriteString(TXT("UI"), TXT("LastFile2"),  m_strLastFile2);
+	iniFile.WriteRect  (TXT("UI"), TXT("MainWindow"), m_lastWndPos);
+	iniFile.WriteString(TXT("UI"), TXT("LastFolder"), m_lastFolder);
+	iniFile.WriteString(TXT("UI"), TXT("LastFile1"),  m_lastFile1);
+	iniFile.WriteString(TXT("UI"), TXT("LastFile2"),  m_lastFile2);
+
+	// Write the ignored settings list.
+	if (g_app.m_modified & TheApp::IGNORE_LIST)
+	{
+		iniFile.WriteUInt(TXT("Ignore"), TXT("Count"), m_ignoreList.size());
+
+		size_t i = 0;
+
+		for (ToolSettings::const_iterator it = m_ignoreList.begin(); it != m_ignoreList.end(); ++it, ++i)
+		{
+			const ToolSetting& toolSetting = *it;
+
+			tstring entry = Core::Fmt(TXT("Item[%u]"), i);
+			tstring value = toolSetting.m_tool + TXT(",") + toolSetting.m_setting;
+
+			iniFile.WriteString(TXT("Ignore"), entry.c_str(), value.c_str());
+		}
+	}
+
+	// Write the build dependent settings list.
+	if (g_app.m_modified & TheApp::BUILDDEP_LIST)
+	{
+		iniFile.WriteUInt(TXT("Build Dependent"), TXT("Count"), m_buildDepList.size());
+
+		size_t i = 0;
+
+		for (ToolSettings::const_iterator it = m_buildDepList.begin(); it != m_buildDepList.end(); ++it, ++i)
+		{
+			const ToolSetting& toolSetting = *it;
+
+			tstring entry = Core::Fmt(TXT("Item[%u]"), i);
+			tstring value = toolSetting.m_tool + TXT(",") + toolSetting.m_setting;
+
+			iniFile.WriteString(TXT("Build Dependent"), entry.c_str(), value.c_str());
+		}
+	}
 }
