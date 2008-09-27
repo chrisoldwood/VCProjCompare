@@ -4,6 +4,10 @@
 	Version="7.10"
 	Name="VCProjCompare"
 	ProjectGUID="{AD1E45B4-FFA1-404E-A559-1F4C5E18462B}"
+	SccProjectName="SAK"
+	SccAuxPath="SAK"
+	SccLocalPath="SAK"
+	SccProvider="SAK"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -150,6 +154,12 @@
 				RelativePath=".\AppWnd.cpp">
 			</File>
 			<File
+				RelativePath=".\FileListDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\OptionsDlg.cpp">
+			</File>
+			<File
 				RelativePath=".\pch.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -168,7 +178,13 @@
 				RelativePath=".\ProgressDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\ProjectCompare.cpp">
+			</File>
+			<File
 				RelativePath=".\TheApp.cpp">
+			</File>
+			<File
+				RelativePath=".\ToolSetting.hpp">
 			</File>
 		</Filter>
 		<Filter
@@ -191,7 +207,19 @@
 				RelativePath=".\Common.hpp">
 			</File>
 			<File
+				RelativePath=".\FileListDlg.hpp">
+			</File>
+			<File
+				RelativePath=".\OptionsDlg.hpp">
+			</File>
+			<File
 				RelativePath=".\ProgressDlg.hpp">
+			</File>
+			<File
+				RelativePath=".\ProjectCompare.hpp">
+			</File>
+			<File
+				RelativePath=".\ProjectFile.hpp">
 			</File>
 			<File
 				RelativePath=".\TheApp.hpp">
@@ -213,7 +241,29 @@
 			<File
 				RelativePath=".\Resource.h">
 			</File>
+			<File
+				RelativePath=".\ResultIcons.bmp">
+			</File>
 		</Filter>
+		<Filter
+			Name="HelpFile"
+			Filter="">
+			<File
+				RelativePath=".\HelpFile\VCProjCompare.html">
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\ReadMe.txt">
+		</File>
+		<File
+			RelativePath=".\RelNotes.txt">
+		</File>
+		<File
+			RelativePath=".\Setup.ini">
+		</File>
+		<File
+			RelativePath=".\TODO.txt">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
