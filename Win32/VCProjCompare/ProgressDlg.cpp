@@ -10,21 +10,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 //! Default constructor.
 
-ProgressDlg::ProgressDlg(CWnd& wndParent)
+ProgressDlg::ProgressDlg(CWnd& parent)
 	: CDialog(IDD_PROGRESS)
-	, m_wndParent(wndParent)
+	, m_parent(parent)
 {
 	DEFINE_CTRL_TABLE
-		CTRL(IDC_STATUS,	&m_txtLabel)
-		CTRL(IDC_PROGRESS,	&m_pbProgress)
+		CTRL(IDC_STATUS,	&m_statusLabel)
+		CTRL(IDC_PROGRESS,	&m_progressBar)
 	END_CTRL_TABLE
 
 	DEFINE_CTRLMSG_TABLE
 	END_CTRLMSG_TABLE
 
-	m_wndParent.Enable(false);
-	RunModeless(wndParent);
-	App.m_MainThread.ProcessMsgQueue();
+	// Create dialog.
+	m_parent.Enable(false);
+	RunModeless(parent);
+	g_app.m_MainThread.ProcessMsgQueue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +33,8 @@ ProgressDlg::ProgressDlg(CWnd& wndParent)
 
 ProgressDlg::~ProgressDlg()
 {
-	m_wndParent.Enable(true);
+	// Destroy dialog.
+	m_parent.Enable(true);
 	Destroy();
 }
 
@@ -42,8 +44,8 @@ ProgressDlg::~ProgressDlg()
 void ProgressDlg::OnInitDialog()
 {
 	// Initialise controls.
-	m_txtLabel.Text(TXT("Initialising..."));
-	m_pbProgress.Range(0, 3);
+	m_statusLabel.Text(TXT("Initialising..."));
+	m_progressBar.Range(0, 5);
 
 	// Display it.
 	Centre();
@@ -53,17 +55,17 @@ void ProgressDlg::OnInitDialog()
 ////////////////////////////////////////////////////////////////////////////////
 //! Set the status message.
 
-void ProgressDlg::SetStatus(const tchar* pszStatus)
+void ProgressDlg::setStatus(const tchar* status)
 {
-	m_txtLabel.Text(pszStatus);
-	m_txtLabel.Update();
+	m_statusLabel.Text(status);
+	m_statusLabel.Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Update the progress bar.
 
-void ProgressDlg::UpdateProgressBar(uint nPos)
+void ProgressDlg::updateProgressBar(uint progress)
 {
-	m_pbProgress.Pos(nPos);
-	m_pbProgress.Update();
+	m_progressBar.Pos(progress);
+	m_progressBar.Update();
 }
