@@ -32,15 +32,15 @@ public:
 	//
 	// Public Members.
 	//
-	AppDlg		m_oAppDlg;		//!< The main dialog.
-	CFrameMenu	m_oMenu;		//!< The main menu.
-	CStatusBar	m_oStatusbar;	//!< The status bar.
+	AppDlg		m_mainView;		//!< The main dialog.
+	CFrameMenu	m_menu;			//!< The main menu.
+	CStatusBar	m_statusBar;	//!< The status bar.
 
 private:
 	//
 	// Internal members.
 	//
-	CAccel		m_oAccel;		//!< The accelerator table.
+	CAccel		m_accelTable;	//!< The accelerator table.
 
 	// Child window IDs.
 	enum
@@ -54,7 +54,7 @@ private:
 	//
 
 	//! Handle window creation.
-	virtual void OnCreate(const CRect& rcClient);
+	virtual void OnCreate(const CRect& clientRect);
 
 	//! Handle the window closing.
 	virtual void OnClose();

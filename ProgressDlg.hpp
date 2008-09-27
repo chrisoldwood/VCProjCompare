@@ -20,7 +20,7 @@ class ProgressDlg : public CDialog
 {
 public:
 	//! Default constructor.
-	ProgressDlg(CWnd& wndParent);
+	ProgressDlg(CWnd& parent);
 	
 	//! Destructor.
 	virtual ~ProgressDlg();
@@ -30,22 +30,22 @@ public:
 	//
 
 	//! Set the status message.
-	void SetStatus(const tchar* pszStatus);
+	void setStatus(const tchar* status);
 
 	//! Update the progress bar.
-	void UpdateProgressBar(uint nPos);
+	void updateProgressBar(uint progress);
 
 private:
 	//
 	// Members.
 	//
-	CWnd&			m_wndParent;		//!< The parent window.
+	CWnd&			m_parent;			//!< The parent window.
 	
 	//
 	// Controls.
 	//
-	CLabel			m_txtLabel;			//!< The status label.
-	CProgressBar	m_pbProgress;		//!< The progress bar.
+	CLabel			m_statusLabel;		//!< The status label.
+	CProgressBar	m_progressBar;		//!< The progress bar.
 
 	//
 	// Message handlers.
