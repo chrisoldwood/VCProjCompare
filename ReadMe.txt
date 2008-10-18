@@ -1,4 +1,4 @@
-VC++ Project Compare v1.0
+VC++ Project Compare v0.8
 =========================
 
 
@@ -15,7 +15,7 @@ Copy the files VCProjCompare.* to a folder.
 2: Uninstallation
 -----------------
 
-Delete the files VCProjCompare.*.
+Delete the files listed above.
 
 
 3: Help/Manual
@@ -33,4 +33,4 @@ Web:   http://www.cix.co.uk/~gort
 
 Chris Oldwood 
 
-23rd September 2008
+29th September 2008
