@@ -13,7 +13,7 @@ td		{ font-family: Verdana, Arial; font-size: 10pt; align: left }
 
 <body>
 
-<h3 align="center">VC++ Project Compare v1.0</h3>
+<h3 align="center">VC++ Project Compare v0.8</h3>
 
 <a name="Introduction"></a>
 <h5>Introduction</h5>
@@ -39,15 +39,57 @@ can refine it before continuing. The alternative is to just pick two specific
 files and compare those. You use the radio buttons at the top of the main view
 to switch between these two mechanisms.
 </p><p>
+<img src="SelectFolder.gif" align="top">
+<img src="SelectFiles.gif" align="top">
+</p><p>
 Once you have chosen your folder or files you can either use "File | List All
 Settings" to just see all the project settings that are contained within the
 project files, or you can use "File | Compare Settings" to perform a comparison.
 At this point, if you chose to find all files in a folder you will be presented
 with a list of the files found and you can choose to exclude some.
 </p><p>
+<img src="FileList.gif" align="top">
+</p><p>
 Then the project files will be parsed and the results displayed in the lower
-grid. The results table is sorted according to the orderof the main columns,
+grid. The results table is sorted according to the order of the main columns,
 i.e. Tool, Setting and then Build Configuration.
+</p><p>
+<img src="Results.gif" align="top">
+</p><p>
+If you chose to run a comparison, then you will see only those settings that
+are different from what the 'common' setting is. The common setting is deemed
+the one the occurs mostly frequently. If all projects have the same setting it
+wont be displayed at all. To show what the 'common' setting is a special row
+appears with an '*' for the filename and path.
+</p>
+
+<a name="RemovingNoise"></a>
+<h5>Removing Noise</h5>
+
+<p>
+The first time you run a comparison you will likely see that a number of
+settings can't be compared directly because they vary wildy, e.g.
+AdditionalIncludeDirectotories. The other common issue is settings that differ
+between build configurations, e.g. RuntimeLibray. If you right-click on the
+results view you will see a context menu,
+</p><p>
+<img src="ContextMenu.gif" align="top">
+</p><p>
+The first option allows you to ignore this project setting altogether, and the
+second will compare it on a per build confuration basis, i.e. separately for
+Debug and Release. If the context menu is grayed out it means that one or other
+setting is already in effect. If you make a mistake you can edit the list of
+special settings through the "Tools | Options..." dialog.
+</p>
+
+<a name="Rescanning"></a>
+<h5>Refreshing The Results</h5>
+
+<p>
+Once you have worked through the differences, either by fixing the project files
+or by marking the setting as build dependent or to be ignored you can refresh
+the list of settings, or comparison results, by using "File | Refresh" or
+pressing F5.
 </p>
 
 <hr>
@@ -77,7 +119,7 @@ Email: <a href="mailto://gort@cix.co.uk">gort@cix.co.uk</a><br>
 Web: <a href="http://www.cix.co.uk/~gort">www.cix.co.uk/~gort</a><br>
 </p><p>
 Chris Oldwood<br>
-23rd September 2008<br>
+29th September 2008<br>
 </p>
 
 </body>
