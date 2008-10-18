@@ -290,7 +290,7 @@ END
 STRINGTABLE 
 BEGIN
     ID_HELP_POPUP           "Help options"
-    ID_HELP_CONTENTS        "Displays the help contents page\nHelp"
+    ID_HELP_CONTENTS        "Display the help contents page\nHelp"
     ID_HELP_ABOUT           "Show Visual C++ Project Compare version\nAbout"
 END
 
@@ -298,9 +298,15 @@ STRINGTABLE
 BEGIN
     ID_FILE_POPUP           "File options"
     ID_FILE_LIST            "Display all the project file settings"
-    ID_FILE_COMPARE         "Compare the project files"
-    ID_FILE_REFRESH         "Refresh the results by scanning the files again"
+    ID_FILE_COMPARE         "Compare the project files for differences"
+    ID_FILE_REFRESH         "Refresh the results by scanning the project files again"
     ID_FILE_EXIT            "Close the application"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_TOOLS_POPUP          "Application settings"
+    ID_TOOLS_OPTIONS        "Configure the application"
 END
 
 #endif    // English (U.K.) resources

@@ -17,9 +17,10 @@
 #define ID_FILE_COMPARE                 102
 #define ID_FILE_REFRESH                 103
 #define ID_FILE_EXIT                    109
-#define ID_CONTEXT_IGNORE               165
-#define ID_CONTEXT_BUILD                166
-#define ID_TOOLS_OPTIONS                167
+#define ID_CONTEXT_IGNORE               200
+#define ID_CONTEXT_BUILD                201
+#define ID_TOOLS_POPUP                  800
+#define ID_TOOLS_OPTIONS                801
 #define ID_HELP_POPUP                   900
 #define ID_HELP_CONTENTS                901
 #define ID_HELP_ABOUT                   902
