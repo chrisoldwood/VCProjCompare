@@ -1,7 +1,13 @@
-- Helpfile.
-
 - Proper app configuation class (IniFile/Registry and correct folder %APPDATA%).
 
 - Saving of the results.
 
 - Command line mode.
+
+- Saving of results column widths.
+
+- Sorting of results.
+
+- Showing files which have setting overrides
+
+- Ignore setting for static libraries or all.
