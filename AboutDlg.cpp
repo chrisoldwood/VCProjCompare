@@ -49,6 +49,6 @@ void AboutDlg::OnInitDialog()
 #endif
 
 	// Update UI.
-	m_versionLabel.setText(version);
-	m_copyrightLabel.setText(copyright);
+	m_versionLabel.Text(version);
+	m_copyrightLabel.Text(copyright);
 }
