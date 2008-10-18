@@ -123,7 +123,7 @@ void OptionsDlg::populateSettings(const ToolSettings& settings)
 	{
 		const ToolSetting& setting = *it;
 
-		m_settingsList.insertItem (i,    setting.m_tool);
-		m_settingsList.setItemText(i, 1, setting.m_setting);
+		m_settingsList.InsertItem(i,    setting.m_tool);
+		m_settingsList.ItemText  (i, 1, setting.m_setting);
 	}
 }

@@ -268,11 +268,11 @@ void AppDlg::displayResults(Table& results)
 	{
 		RowPtr row = results[i];
 
-		m_resultsView.insertItem (i,    row->at(0));
-		m_resultsView.setItemText(i, 1, row->at(1));
-		m_resultsView.setItemText(i, 2, row->at(2));
-		m_resultsView.setItemText(i, 3, row->at(3));
-		m_resultsView.setItemText(i, 4, row->at(4));
-		m_resultsView.setItemText(i, 5, row->at(5));
+		m_resultsView.InsertItem(i,    row->at(0));
+		m_resultsView.ItemText  (i, 1, row->at(1));
+		m_resultsView.ItemText  (i, 2, row->at(2));
+		m_resultsView.ItemText  (i, 3, row->at(3));
+		m_resultsView.ItemText  (i, 4, row->at(4));
+		m_resultsView.ItemText  (i, 5, row->at(5));
 	}
 }
