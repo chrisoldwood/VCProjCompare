@@ -57,6 +57,19 @@ private:
 	CListView	m_resultsView;	//!< The list view for the results.
 	CFont		m_resultsFont;	//!< The font to use for the results view.
 
+	//! The results columns.
+	enum Column
+	{
+		TOOL,
+		SETTING,
+		BUILD,
+		PROJECT,
+		PATH,
+		VALUE,
+
+		NUM_COLUMNS,
+	};
+
 	//
 	// Message processors.
 	//
