@@ -27,13 +27,13 @@ private:
 	//
 	// Members.
 	//
-	ToolSettings	m_ignoreList;		//!< The settings to be ignored when comparing.
+	ToolSettings	m_projectDepList;	//!< The settings that are project dependent.
 	ToolSettings	m_buildDepList;		//!< The settings that are build dependent.
 
 	//
 	// Controls.
 	//
-	CRadioBtn		m_ignoreButton;		//!< Button to select the Ignore settings.
+	CRadioBtn		m_projectButton;	//!< Button to select the Project Dependent settings.
 	CRadioBtn		m_buildButton;		//!< Button to select the Build Dependent settings.
 	CListView		m_settingsList;		//!< The view of the list of settings.
 
@@ -47,10 +47,10 @@ private:
 	//! OK button handler.
 	virtual bool OnOk();
 
-	//! Switch to the Ignored settings list.
-	void onEditIgnoreList();
+	//! Switch to the Project Dependent settings list.
+	void onEditProjectList();
 
-	//! Switch to the build settings list.
+	//! Switch to the Build Dependent settings list.
 	void onEditBuildList();
 
 	//! Remove the selected setting.
