@@ -1,4 +1,4 @@
-VC++ Project Compare v0.8
+VC++ Project Compare v1.0
 =========================
 
 
@@ -33,4 +33,4 @@ Web:   http://www.cix.co.uk/~gort
 
 Chris Oldwood 
 
-29th September 2008
+10th December 2008

@@ -1,10 +1,10 @@
-Version 0.8
+Version 1.0
 ===========
 
-- First public beta.
+- First public release.
 
 
 Chris Oldwood 
 [gort@cix.co.uk]
 
-29th September 2008
+10th December 2008
