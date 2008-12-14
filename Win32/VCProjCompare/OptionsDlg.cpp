@@ -15,13 +15,13 @@ OptionsDlg::OptionsDlg()
 	: CDialog(IDD_OPTIONS)
 {
 	DEFINE_CTRL_TABLE
-		CTRL(IDC_IGNORE,	&m_ignoreButton)
+		CTRL(IDC_PROJECT,	&m_projectButton)
 		CTRL(IDC_BUILD,		&m_buildButton)
 		CTRL(IDC_SETTINGS,	&m_settingsList)
 	END_CTRL_TABLE
 
 	DEFINE_CTRLMSG_TABLE
-		CMD_CTRLMSG(IDC_IGNORE,	BN_CLICKED,	&OptionsDlg::onEditIgnoreList)
+		CMD_CTRLMSG(IDC_PROJECT,BN_CLICKED,	&OptionsDlg::onEditProjectList)
 		CMD_CTRLMSG(IDC_BUILD,	BN_CLICKED,	&OptionsDlg::onEditBuildList)
 		CMD_CTRLMSG(IDC_REMOVE,	BN_CLICKED,	&OptionsDlg::onRemoveSetting)
 	END_CTRLMSG_TABLE
@@ -33,17 +33,17 @@ OptionsDlg::OptionsDlg()
 void OptionsDlg::OnInitDialog()
 {
 	// Capture existing settings.
-	m_ignoreList   = g_app.m_ignoreList;
-	m_buildDepList = g_app.m_buildDepList;
+	m_projectDepList = g_app.m_projectDepList;
+	m_buildDepList   = g_app.m_buildDepList;
 
 	// Initialise controls.
 	m_settingsList.InsertColumn(0, TXT("Tool"),    m_settingsList.StringWidth(30), LVCFMT_LEFT);
 	m_settingsList.InsertColumn(1, TXT("Setting"), m_settingsList.StringWidth(30), LVCFMT_LEFT);
 	m_settingsList.FullRowSelect();
 
-	m_ignoreButton.Check(true);
+	m_projectButton.Check(true);
 	m_buildButton.Check(false);
-	onEditIgnoreList();
+	onEditProjectList();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,8 +52,8 @@ void OptionsDlg::OnInitDialog()
 bool OptionsDlg::OnOk()
 {
 	// Save new settings.
-	g_app.m_ignoreList = m_ignoreList;
-	g_app.m_modified  |= TheApp::IGNORE_LIST;
+	g_app.m_projectDepList = m_projectDepList;
+	g_app.m_modified      |= TheApp::PROJECT_LIST;
 
 	g_app.m_buildDepList = m_buildDepList;
 	g_app.m_modified    |= TheApp::BUILDDEP_LIST;
@@ -62,15 +62,15 @@ bool OptionsDlg::OnOk()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Switch to the Ignored settings list.
+//! Switch to the Project Dependent settings list.
 
-void OptionsDlg::onEditIgnoreList()
+void OptionsDlg::onEditProjectList()
 {
-	populateSettings(m_ignoreList);
+	populateSettings(m_projectDepList);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Switch to the build settings list.
+//! Switch to the Build Dependent settings list.
 
 void OptionsDlg::onEditBuildList()
 {
@@ -94,8 +94,8 @@ void OptionsDlg::onRemoveSetting()
 	toolSetting.m_setting = m_settingsList.ItemText(selection, 1);
 
 	// Remove from the list.
-	if (m_ignoreButton.IsChecked())
-		m_ignoreList.erase(m_ignoreList.find(toolSetting));
+	if (m_projectButton.IsChecked())
+		m_projectDepList.erase(m_projectDepList.find(toolSetting));
 	else
 		m_buildDepList.erase(m_buildDepList.find(toolSetting));
 
