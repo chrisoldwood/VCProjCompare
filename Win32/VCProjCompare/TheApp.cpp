@@ -5,11 +5,11 @@
 
 #include "Common.hpp"
 #include "TheApp.hpp"
-#include <WCL/IniFile.hpp>
 #include <Core/StringUtils.hpp>
-#include <WCL/StrTok.hpp>
-#include <WCL/StrArray.hpp>
 #include <WCL/BusyCursor.hpp>
+#include <WCL/AppConfig.hpp>
+#include <Core/ConfigurationException.hpp>
+#include <limits>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global variables.
@@ -20,8 +20,12 @@ TheApp g_app;
 ////////////////////////////////////////////////////////////////////////////////
 // Constants.
 
-//! The .ini file format version number.
-const tchar* INI_FILE_VER = TXT("1.0");
+//! The configuration data publisher name.
+const tchar* PUBLISHER = TXT("Chris Oldwood");
+//! The configuration data application name.
+const tchar* APPLICATION = TXT("VC++ Project Compare");
+//! The configuration data format version.
+const tchar* CONFIG_VERSION = TXT("1.0");
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Constructor.
@@ -56,10 +60,18 @@ bool TheApp::OnOpen()
 	m_lastFile2 = CPath::ApplicationDir();
 
 	// Set the app title.
-	m_strTitle = TXT("Visual C++ Project Compare");
+	m_strTitle = APPLICATION;
 
-	// Load settings.
-	loadConfig();
+	try
+	{
+		// Load settings.
+		loadConfig();
+	}
+	catch (const Core::Exception& e)
+	{
+		FatalMsg(TXT("Failed to configure the application:-\n\n%s"), e.What());
+		return false;
+	}
 	
 	// Create the main window.
 	if (!m_appWnd.Create())
@@ -82,8 +94,16 @@ bool TheApp::OnOpen()
 
 bool TheApp::OnClose()
 {
-	// Save settings.
-	saveConfig();
+	try
+	{
+		// Save settings.
+		saveConfig();
+	}
+	catch (const Core::Exception& e)
+	{
+		FatalMsg(TXT("Failed to save the application configuration:-\n\n%s"), e.What());
+		return false;
+	}
 
 	return true;
 }
@@ -93,48 +113,49 @@ bool TheApp::OnClose()
 
 void TheApp::loadConfig()
 {
-	CIniFile    iniFile;
-	CBusyCursor busyCursor;
+	CBusyCursor    busyCursor;
+	WCL::AppConfig appConfig(PUBLISHER, APPLICATION);
 
-	// Read the file version.
-	tstring version = iniFile.ReadString(TXT("Version"), TXT("Version"), INI_FILE_VER);
+	// Read the config data version.
+	tstring version = appConfig.readString(appConfig.DEFAULT_SECTION, TXT("Version"), CONFIG_VERSION);
+
+	if (version != CONFIG_VERSION)
+		throw Core::ConfigurationException(Core::Fmt(TXT("The configuration data is incompatible - '%s'"), version.c_str()));
 
 	// Read the UI settings.
-	m_lastWndPos = iniFile.ReadRect  (TXT("UI"), TXT("MainWindow"), m_lastWndPos);
-	m_lastFolder = iniFile.ReadString(TXT("UI"), TXT("LastFolder"), m_lastFolder);
-	m_lastFile1  = iniFile.ReadString(TXT("UI"), TXT("LastFile1"),  m_lastFile1);
-	m_lastFile2  = iniFile.ReadString(TXT("UI"), TXT("LastFile2"),  m_lastFile2);
+	m_lastWndPos = appConfig.readValue<CRect>(TXT("UI"), TXT("MainWindow"), m_lastWndPos);
+	m_lastFolder = appConfig.readString(TXT("UI"), TXT("LastFolder"), m_lastFolder);
+	m_lastFile1  = appConfig.readString(TXT("UI"), TXT("LastFile1"),  m_lastFile1);
+	m_lastFile2  = appConfig.readString(TXT("UI"), TXT("LastFile2"),  m_lastFile2);
 
 	// Read the ignored settings list.
-	size_t count = iniFile.ReadUInt(TXT("Ignore"), TXT("Count"), 0);
+	const size_t max = std::numeric_limits<size_t>::max();
 
-	for (size_t i = 0; i != count; ++i)
+	for (size_t i = 0; i != max; ++i)
 	{
-		tstring entry = Core::Fmt(TXT("Item[%u]"), i);
-		tstring value = iniFile.ReadString(TXT("Ignore"), entry.c_str(), tstring());
+		tstring entry = Core::Fmt(TXT("%u"), i);
 
-		CStrArray fields;
+		WCL::AppConfig::StringArray values;
+		appConfig.readList(TXT("Project Dependent"), entry, TXT(""), values);
 
-		if (CStrTok::Split(value.c_str(), TXT(','), fields) != 2)
-			continue;
+		if (values.size() != 2)
+			break;
 
-		m_ignoreList.insert(ToolSetting(tstring(fields[0]), tstring(fields[1])));
+		m_projectDepList.insert(ToolSetting(values[0], values[1]));
 	}
 
 	// Read the build dependent settings list.
-	count = iniFile.ReadUInt(TXT("Build Dependent"), TXT("Count"), 0);
-
-	for (size_t i = 0; i != count; ++i)
+	for (size_t i = 0; i != max; ++i)
 	{
-		tstring entry = Core::Fmt(TXT("Item[%u]"), i);
-		tstring value = iniFile.ReadString(TXT("Build Dependent"), entry.c_str(), tstring());
+		tstring entry = Core::Fmt(TXT("%u"), i);
 
-		CStrArray fields;
+		WCL::AppConfig::StringArray values;
+		appConfig.readList(TXT("Build Dependent"), entry, TXT(""), values);
 
-		if (CStrTok::Split(value.c_str(), TXT(','), fields) != 2)
-			continue;
+		if (values.size() != 2)
+			break;
 
-		m_buildDepList.insert(ToolSetting(tstring(fields[0]), tstring(fields[1])));
+		m_buildDepList.insert(ToolSetting(values[0], values[1]));
 	}
 }
 
@@ -143,40 +164,40 @@ void TheApp::loadConfig()
 
 void TheApp::saveConfig()
 {
-	CIniFile    iniFile;
-	CBusyCursor busyCursor;
+	CBusyCursor    busyCursor;
+	WCL::AppConfig appConfig(PUBLISHER, APPLICATION);
 
-	// Write the file version.
-	iniFile.WriteString(TXT("Version"), TXT("Version"), INI_FILE_VER);
+	// Write the config data version.
+	appConfig.writeString(appConfig.DEFAULT_SECTION, TXT("Version"), CONFIG_VERSION);
 
 	// Write the UI settings.
-	iniFile.WriteRect  (TXT("UI"), TXT("MainWindow"), m_lastWndPos);
-	iniFile.WriteString(TXT("UI"), TXT("LastFolder"), m_lastFolder);
-	iniFile.WriteString(TXT("UI"), TXT("LastFile1"),  m_lastFile1);
-	iniFile.WriteString(TXT("UI"), TXT("LastFile2"),  m_lastFile2);
+	appConfig.writeValue<CRect>(TXT("UI"), TXT("MainWindow"), m_lastWndPos);
+	appConfig.writeString(TXT("UI"), TXT("LastFolder"), m_lastFolder);
+	appConfig.writeString(TXT("UI"), TXT("LastFile1"),  m_lastFile1);
+	appConfig.writeString(TXT("UI"), TXT("LastFile2"),  m_lastFile2);
 
 	// Write the ignored settings list.
-	if (g_app.m_modified & TheApp::IGNORE_LIST)
+	if (g_app.m_modified & TheApp::PROJECT_LIST)
 	{
-		iniFile.WriteUInt(TXT("Ignore"), TXT("Count"), m_ignoreList.size());
+		appConfig.deleteSection(TXT("Project Dependent"));
 
 		size_t i = 0;
 
-		for (ToolSettings::const_iterator it = m_ignoreList.begin(); it != m_ignoreList.end(); ++it, ++i)
+		for (ToolSettings::const_iterator it = m_projectDepList.begin(); it != m_projectDepList.end(); ++it, ++i)
 		{
 			const ToolSetting& toolSetting = *it;
 
-			tstring entry = Core::Fmt(TXT("Item[%u]"), i);
+			tstring entry = Core::Fmt(TXT("%u"), i);
 			tstring value = toolSetting.m_tool + TXT(",") + toolSetting.m_setting;
 
-			iniFile.WriteString(TXT("Ignore"), entry.c_str(), value.c_str());
+			appConfig.writeString(TXT("Project Dependent"), entry, value);
 		}
 	}
 
 	// Write the build dependent settings list.
 	if (g_app.m_modified & TheApp::BUILDDEP_LIST)
 	{
-		iniFile.WriteUInt(TXT("Build Dependent"), TXT("Count"), m_buildDepList.size());
+		appConfig.deleteSection(TXT("Build Dependent"));
 
 		size_t i = 0;
 
@@ -184,10 +205,10 @@ void TheApp::saveConfig()
 		{
 			const ToolSetting& toolSetting = *it;
 
-			tstring entry = Core::Fmt(TXT("Item[%u]"), i);
+			tstring entry = Core::Fmt(TXT("%u"), i);
 			tstring value = toolSetting.m_tool + TXT(",") + toolSetting.m_setting;
 
-			iniFile.WriteString(TXT("Build Dependent"), entry.c_str(), value.c_str());
+			appConfig.writeString(TXT("Build Dependent"), entry, value);
 		}
 	}
 }

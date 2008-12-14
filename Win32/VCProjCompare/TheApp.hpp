@@ -28,7 +28,7 @@ public:
 	//! The modified settings flags.
 	enum Settings
 	{
-		IGNORE_LIST		= 0x0001,	//!< The list of settings to ignore.
+		PROJECT_LIST	= 0x0001,	//!< The list of project dependent settings.
 		BUILDDEP_LIST	= 0x0002,	//!< The list of build dependent settings.
 	};
 
@@ -60,7 +60,7 @@ public:
 	tstring			m_lastFolder;		//!< The last folder to be compared.
 	tstring			m_lastFile1;		//!< The last file to be compared.
 	tstring			m_lastFile2;		//!< The last file to be compared
-	ToolSettings	m_ignoreList;		//!< The settings to be ignored when comparing.
+	ToolSettings	m_projectDepList;	//!< The settings that are project dependent.
 	ToolSettings	m_buildDepList;		//!< The settings that are build dependent.
 
 	//
