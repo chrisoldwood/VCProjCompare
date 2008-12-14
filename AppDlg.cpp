@@ -92,12 +92,12 @@ void AppDlg::OnInitDialog()
 
 //	m_resultsView.Font(m_resultsFont);
 	m_resultsView.ImageList(LVSIL_SMALL, IDB_RESICONS, 16, RGB(255, 0, 255));
-	m_resultsView.InsertColumn(0, TXT("Tool"),    m_resultsView.StringWidth(20), LVCFMT_LEFT);
-	m_resultsView.InsertColumn(1, TXT("Setting"), m_resultsView.StringWidth(25), LVCFMT_LEFT);
-	m_resultsView.InsertColumn(2, TXT("Build"),   m_resultsView.StringWidth(15), LVCFMT_LEFT);
-	m_resultsView.InsertColumn(3, TXT("Project"), m_resultsView.StringWidth(25), LVCFMT_LEFT);
-	m_resultsView.InsertColumn(4, TXT("Path"),    m_resultsView.StringWidth(25), LVCFMT_LEFT);
-	m_resultsView.InsertColumn(5, TXT("Value"),   m_resultsView.StringWidth(30), LVCFMT_LEFT);
+	m_resultsView.InsertColumn(TOOL,    TXT("Tool"),    m_resultsView.StringWidth(20), LVCFMT_LEFT);
+	m_resultsView.InsertColumn(SETTING, TXT("Setting"), m_resultsView.StringWidth(25), LVCFMT_LEFT);
+	m_resultsView.InsertColumn(BUILD,   TXT("Build"),   m_resultsView.StringWidth(15), LVCFMT_LEFT);
+	m_resultsView.InsertColumn(PROJECT, TXT("Project"), m_resultsView.StringWidth(25), LVCFMT_LEFT);
+	m_resultsView.InsertColumn(PATH,    TXT("Path"),    m_resultsView.StringWidth(25), LVCFMT_LEFT);
+	m_resultsView.InsertColumn(VALUE,   TXT("Value"),   m_resultsView.StringWidth(30), LVCFMT_LEFT);
 	m_resultsView.FullRowSelect(true);
 }
 
@@ -180,14 +180,14 @@ LRESULT AppDlg::onRightClickResult(NMHDR& /*event*/)
 		toolSetting.m_setting = m_resultsView.ItemText(selection, 1);
 
 		// Check setting status.
-		bool ignored  = (g_app.m_ignoreList.find(toolSetting) != g_app.m_ignoreList.end());
-		bool buildDep = (g_app.m_buildDepList.find(toolSetting) != g_app.m_buildDepList.end());
+		bool projectDep = (g_app.m_projectDepList.find(toolSetting) != g_app.m_projectDepList.end());
+		bool buildDep   = (g_app.m_buildDepList.find(toolSetting) != g_app.m_buildDepList.end());
 
 		CPopupMenu menu(IDR_CONTEXT);
 
 		// Enable/Disable relevant commands.
-		menu.EnableCmd(ID_CONTEXT_IGNORE, !ignored && !buildDep);
-		menu.EnableCmd(ID_CONTEXT_BUILD,  !ignored && !buildDep);
+		menu.EnableCmd(ID_CONTEXT_PROJECT,!projectDep && !buildDep);
+		menu.EnableCmd(ID_CONTEXT_BUILD,  !projectDep && !buildDep);
 
 		// Show context menu.
 		const MSG& msg = g_app.m_MainThread.CurrentMsg();
@@ -195,10 +195,10 @@ LRESULT AppDlg::onRightClickResult(NMHDR& /*event*/)
 		uint cmd = menu.TrackMenu(m_resultsView, msg.pt);
 
 		// Add to ignored settings list?
-		if (cmd == ID_CONTEXT_IGNORE)
+		if (cmd == ID_CONTEXT_PROJECT)
 		{
-			g_app.m_ignoreList.insert(toolSetting);
-			g_app.m_modified |= TheApp::IGNORE_LIST;
+			g_app.m_projectDepList.insert(toolSetting);
+			g_app.m_modified |= TheApp::PROJECT_LIST;
 		}
 		// Add to build dependent settings list?
 		else if (cmd == ID_CONTEXT_BUILD)
@@ -268,11 +268,13 @@ void AppDlg::displayResults(Table& results)
 	{
 		RowPtr row = results[i];
 
-		m_resultsView.InsertItem(i,    row->at(0));
-		m_resultsView.ItemText  (i, 1, row->at(1));
-		m_resultsView.ItemText  (i, 2, row->at(2));
-		m_resultsView.ItemText  (i, 3, row->at(3));
-		m_resultsView.ItemText  (i, 4, row->at(4));
-		m_resultsView.ItemText  (i, 5, row->at(5));
+		ASSERT(row->size() == NUM_COLUMNS);
+
+		m_resultsView.InsertItem(i,          row->at(TOOL));
+		m_resultsView.ItemText  (i, SETTING, row->at(SETTING));
+		m_resultsView.ItemText  (i, BUILD,   row->at(BUILD));
+		m_resultsView.ItemText  (i, PROJECT, row->at(PROJECT));
+		m_resultsView.ItemText  (i, PATH,    row->at(PATH));
+		m_resultsView.ItemText  (i, VALUE,   row->at(VALUE));
 	}
 }
