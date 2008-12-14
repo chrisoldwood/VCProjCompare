@@ -87,7 +87,7 @@ IDR_CONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
-        MENUITEM "&Ignore Setting",             ID_CONTEXT_IGNORE
+        MENUITEM "&Project Dependent Setting",  ID_CONTEXT_PROJECT
         MENUITEM "&Build Dependent Setting",    ID_CONTEXT_BUILD
     END
 END
@@ -172,10 +172,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CLIPSIBLINGS |
 CAPTION "Options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Edit the project settings to be &ignored:",IDC_IGNORE,
-                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,5,5,200,10
-    CONTROL         "Edit the project settings that are &build dependent:",
-                    IDC_BUILD,"Button",BS_AUTORADIOBUTTON,5,15,200,10
+    CONTROL         "Edit the settings that are &project dependent:",
+                    IDC_PROJECT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,5,5,
+                    200,10
+    CONTROL         "Edit the settings that are &build dependent:",IDC_BUILD,
+                    "Button",BS_AUTORADIOBUTTON,5,15,200,10
     CONTROL         "",IDC_SETTINGS,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
                     LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,30,250,100,

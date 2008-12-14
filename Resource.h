@@ -17,7 +17,7 @@
 #define ID_FILE_COMPARE                 102
 #define ID_FILE_REFRESH                 103
 #define ID_FILE_EXIT                    109
-#define ID_CONTEXT_IGNORE               200
+#define ID_CONTEXT_PROJECT              173
 #define ID_CONTEXT_BUILD                201
 #define ID_TOOLS_POPUP                  800
 #define ID_TOOLS_OPTIONS                801
@@ -40,7 +40,7 @@
 #define IDC_PROGRESS                    1096
 #define IDC_STATUS                      1097
 #define IDC_SETTINGS                    1099
-#define IDC_IGNORE                      1100
+#define IDC_PROJECT                     1100
 #define IDC_BUILD                       1101
 #define IDC_REMOVE                      1102
 #define IDC_HEADING                     1103
@@ -54,7 +54,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         173
+#define _APS_NEXT_COMMAND_VALUE         174
 #define _APS_NEXT_CONTROL_VALUE         1104
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
