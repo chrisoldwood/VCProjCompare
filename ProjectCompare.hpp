@@ -24,8 +24,10 @@ typedef std::vector<tstring> FileList;
 //! A collection of vc++ projects.
 typedef std::vector<ProjectFile> Projects;
 
+//! A project setting value.
+typedef Core::SharedPtr<tstring> ValuePtr;
 //! The collection of project values.
-typedef std::vector<tstring> Values;
+typedef std::vector<ValuePtr> Values;
 //! The map of configuration name to project values.
 typedef std::map<tstring, Values> ConfigValues;
 //! The map of setting name to configurations.

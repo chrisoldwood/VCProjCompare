@@ -9,7 +9,7 @@
 #include <WCL/File.hpp>
 #include <XML/Reader.hpp>
 #include <XML/XPathIterator.hpp>
-#include <XML/ParseException.hpp>
+#include <Core/ParseException.hpp>
 #include <Core/StringUtils.hpp>
 #include "TheApp.hpp"
 
@@ -18,6 +18,11 @@
 
 typedef std::map<tstring, uint> ValueCounts;
 typedef std::map<tstring, ValueCounts> ConfigValueCounts;
+
+////////////////////////////////////////////////////////////////////////////////
+// Local constants.
+
+static const tstring DEFAULT = TXT("(default)");
 
 ////////////////////////////////////////////////////////////////////////////////
 //! The recursive function to find the files.
@@ -81,8 +86,14 @@ bool readProjectFiles(Projects& projects)
 
 bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 {
+	// Type aliases.
+	typedef std::set<size_t> Indexes;
+
 	settings.clear();
 
+	Indexes libProjects;
+
+	// For each project...
 	for (size_t p = 0; p < projects.size(); ++p)
 	{
 		const ProjectFile& project = projects[p];
@@ -92,7 +103,7 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 			XML::ElementNodePtr projectNode = project.m_xmlDoc->GetRootElement();
 
 			if ((projectNode.Get() == nullptr) || (projectNode->Name() != TXT("VisualStudioProject")))
-				throw XML::ParseException(TXT("Failed to locate the <VisualStudioProject> node"));
+				throw Core::ParseException(TXT("Failed to locate the <VisualStudioProject> node"));
 
 			// Extract key.
 			tstring projectName = projectNode->GetAttributes().Get(TXT("Name"))->Value();
@@ -109,6 +120,10 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 
 				// Extract key.
 				tstring configName = configNode->GetAttributes().Get(TXT("Name"))->Value();
+				tstring configType = configNode->GetAttributes().Get(TXT("ConfigurationType"))->Value();
+
+				if (configType == TXT("4"))
+					libProjects.insert(p);
 
 				// For each tool...
 				XML::XPathIterator toolIter(TXT("Tool"), configNode);
@@ -145,9 +160,12 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 
 						// Default all project setting values.
 						if (values.empty())
-							values.resize(projects.size(), TXT("(default)"));
+						{
+							for (size_t i = 0; i != projects.size(); ++i)
+								values.push_back(ValuePtr(new tstring(DEFAULT)));
+						}
 
-						values[p] = value;
+						*values[p] = value;
 					}
 				}
 			}	
@@ -156,6 +174,46 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 		{
 			g_app.FatalMsg(TXT("Failed to parse project file:-\n\n%s\n\n%s"), project.m_fileName.c_str(), e.What());
 			return false;
+		}
+	}
+
+	if (!libProjects.empty())
+	{
+		// Remove settings not applicable to static library projects.
+		for (Indexes::const_iterator it = libProjects.begin(); it != libProjects.end(); ++it)
+		{
+			const size_t& index = *it;
+
+			// For each tool...
+			for (ProjectSettings::iterator toolIter = settings.begin(); toolIter != settings.end(); ++toolIter)
+			{
+				const tstring&  tool           = toolIter->first;
+				ConfigSettings& configSettings = toolIter->second;
+
+				// Tool not valid for static libraries?
+				if ( (tstricmp(tool.c_str(), TXT("VCLinkerTool")) == 0)
+				  || (tstricmp(tool.c_str(), TXT("VCResourceCompilerTool")) == 0)
+				  || (tstricmp(tool.c_str(), TXT("VCMIDLTool")) == 0) )
+				{
+					// For each setting...
+					for (ConfigSettings::iterator settingIter = configSettings.begin(); settingIter != configSettings.end(); ++settingIter)
+					{
+//						const tstring& setting      = settingIter->first;
+						ConfigValues&  configValues = settingIter->second;
+
+						// For each build configuration...
+						for (ConfigValues::iterator configIter = configValues.begin(); configIter != configValues.end(); ++configIter)
+						{
+//							const tstring& config = configIter->first;
+							Values&        values = configIter->second;
+
+							ASSERT(*values[index] == DEFAULT);
+
+							values[index].Reset();
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -188,9 +246,13 @@ void listSettings(const Projects& projects, const ProjectSettings& settings, Tab
 				// For each project...
 				for (size_t i = 0; i < projects.size(); ++i)
 				{
+					// Ignore settings that are not applicable.
+					if (values[i].Get() == nullptr)
+						continue;
+
 					const tstring& project = projects[i].m_fileName;
 					const tstring& path    = projects[i].m_pathName;
-					const tstring& value   = values[i];
+					const tstring& value   = *values[i];
 
 					RowPtr row(new Row);
 
@@ -258,7 +320,7 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 			const ConfigValues& configValues = settingIter->second;
 
 			// Ignore this setting?
-			if (g_app.m_ignoreList.find(ToolSetting(tool, setting)) != g_app.m_ignoreList.end())
+			if (g_app.m_projectDepList.find(ToolSetting(tool, setting)) != g_app.m_projectDepList.end())
 				continue;
 
 			//
@@ -278,9 +340,10 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 
 					for (Values::const_iterator itValue = values.begin(); itValue != values.end(); ++itValue)
 					{
-						const tstring& value = *itValue;
+						const ValuePtr& value = *itValue;
 
-						configValueCounts[config][value]++;
+						if (value.Get() != nullptr)
+							configValueCounts[config][*value]++;
 					}
 				}
 
@@ -315,9 +378,13 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 
 					for (size_t i = 0; i < projects.size(); ++i)
 					{
+						// Ignore settings that are not applicable.
+						if (values[i].Get() == nullptr)
+							continue;
+
 						const tstring& project = projects[i].m_fileName;
 						const tstring& path    = projects[i].m_pathName;
-						const tstring& value   = values[i];
+						const tstring& value   = *values[i];
 
 						if (!unique || (value != commonValue))
 						{
@@ -347,9 +414,10 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 
 					for (Values::const_iterator valueIter = values.begin(); valueIter != values.end(); ++valueIter)
 					{
-						const tstring& value = *valueIter;
+						const ValuePtr& value = *valueIter;
 
-						valueCounts[value]++;
+						if (value.Get() != nullptr)
+							valueCounts[*value]++;
 					}
 				}
 
@@ -381,9 +449,13 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 
 					for (size_t i = 0; i < projects.size(); ++i)
 					{
+						// Ignore settings that are not applicable.
+						if (values[i].Get() == nullptr)
+							continue;
+
 						const tstring& project = projects[i].m_fileName;
 						const tstring& path    = projects[i].m_pathName;
-						const tstring& value   = values[i];
+						const tstring& value   = *values[i];
 
 						if (!unique || (value != commonValue))
 						{
