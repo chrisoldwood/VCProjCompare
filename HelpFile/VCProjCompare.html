@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title>VC++ Project Compare Manual</title>
+<title>Visual C++ Project Compare Manual</title>
 <meta name="author" content="Chris Oldwood">
 <style>
 <!--
@@ -13,7 +13,7 @@ td		{ font-family: Verdana, Arial; font-size: 10pt; align: left }
 
 <body>
 
-<h3 align="center">VC++ Project Compare v0.8</h3>
+<h3 align="center">Visual C++ Project Compare v1.0</h3>
 
 <a name="Introduction"></a>
 <h5>Introduction</h5>
@@ -75,19 +75,24 @@ results view you will see a context menu,
 </p><p>
 <img src="ContextMenu.gif" align="top">
 </p><p>
-The first option allows you to ignore this project setting altogether, and the
-second will compare it on a per build confuration basis, i.e. separately for
-Debug and Release. If the context menu is grayed out it means that one or other
-setting is already in effect. If you make a mistake you can edit the list of
-special settings through the "Tools | Options..." dialog.
+The first option allows you to mark this setting as project dependent, which
+has the effect of hiding it altogether. The second ensures that the comparison
+is done on a per build configuration basis, e.g. separately for Debug and
+Release. If the context menu is grayed out it means that one or other setting
+is already in effect. If you make a mistake you can edit the list of dependent
+settings through the "Tools | Options..." dialog.
+</p><p>
+<img src="OptionsDlg.gif" align="top">
+</p><p>
+This dialog only allows you to remove settings.
 </p>
 
 <a name="Rescanning"></a>
 <h5>Refreshing The Results</h5>
 
 <p>
-Once you have worked through the differences, either by fixing the project files
-or by marking the setting as build dependent or to be ignored you can refresh
+Once you have worked through the differences, either by fixing the project
+files or by marking the setting as project or build dependent you can refresh
 the list of settings, or comparison results, by using "File | Refresh" or
 pressing F5.
 </p>
@@ -119,7 +124,7 @@ Email: <a href="mailto://gort@cix.co.uk">gort@cix.co.uk</a><br>
 Web: <a href="http://www.cix.co.uk/~gort">www.cix.co.uk/~gort</a><br>
 </p><p>
 Chris Oldwood<br>
-29th September 2008<br>
+10th December 2008<br>
 </p>
 
 </body>
