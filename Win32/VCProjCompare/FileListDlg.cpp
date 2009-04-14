@@ -34,7 +34,7 @@ void FileListDlg::OnInitDialog()
 	// Populate controls.
 	for (FileList::const_iterator it = m_files.begin(); it != m_files.end(); ++it)
 	{
-		int i = m_filesView.AppendItem(it->c_str());
+		size_t i = m_filesView.AppendItem(it->c_str());
 		m_filesView.SetChecked(i, true);
 	}
 }
