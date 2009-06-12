@@ -66,7 +66,7 @@ BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&List All Settings\tCtrl+L",  ID_FILE_LIST
-        MENUITEM "&Compare Settings\tCtrl+C",   ID_FILE_COMPARE
+        MENUITEM "&Compare Settings\tCtrl+M",   ID_FILE_COMPARE
         MENUITEM "&Refresh\tF5",                ID_FILE_REFRESH
         MENUITEM SEPARATOR
         MENUITEM "E&xit\tAlt+F4",               ID_FILE_EXIT
@@ -194,10 +194,10 @@ END
 
 IDR_APPACCEL ACCELERATORS 
 BEGIN
-    VK_F1,          ID_HELP_CONTENTS,       VIRTKEY, NOINVERT
+    "M",            ID_FILE_COMPARE,        VIRTKEY, CONTROL, NOINVERT
     "L",            ID_FILE_LIST,           VIRTKEY, CONTROL, NOINVERT
-    "C",            ID_FILE_COMPARE,        VIRTKEY, CONTROL, NOINVERT
     VK_F5,          ID_FILE_REFRESH,        VIRTKEY, NOINVERT
+    VK_F1,          ID_HELP_CONTENTS,       VIRTKEY, NOINVERT
 END
 
 
