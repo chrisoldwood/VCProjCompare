@@ -15,6 +15,7 @@
 #include "ProjectFile.hpp"
 #include "ToolSetting.hpp"
 #include <set>
+#include <map>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Type aliases.
