@@ -118,12 +118,46 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 
 				ASSERT(configNode.Get() != nullptr);
 
+				const XML::Attributes& configAttribs = configNode->GetAttributes();
+
 				// Extract key.
-				tstring configName = configNode->GetAttributes().Get(TXT("Name"))->Value();
-				tstring configType = configNode->GetAttributes().Get(TXT("ConfigurationType"))->Value();
+				tstring configName = configAttribs.Get(TXT("Name"))->Value();
+				tstring configType = configAttribs.Get(TXT("ConfigurationType"))->Value();
 
 				if (configType == TXT("4"))
 					libProjects.insert(p);
+
+				// For each configuration attribute...
+				XML::Attributes::const_iterator attribsIter = configAttribs.Begin();
+				XML::Attributes::const_iterator attribsEnd  = configAttribs.End();
+
+				for (;attribsIter != attribsEnd; ++attribsIter)
+				{
+					const XML::AttributePtr& attrib  = *attribsIter;
+					const tstring&           setting = attrib->Name();
+					const tstring&           value   = attrib->Value();
+
+					// Ignore 'Name' as it's already the 'Build' subkey.
+					if (setting == TXT("Name"))
+						continue;
+
+					// Create tool subkey.
+					tstring         toolName       = TXT("Configuration");
+					ConfigSettings& configSettings = settings[toolName];
+
+					// Create setting subkey.
+					ConfigValues& configValues = configSettings[setting];
+					Values&       values       = configValues[configName];
+
+					// Default all project setting values.
+					if (values.empty())
+					{
+						for (size_t i = 0; i != projects.size(); ++i)
+							values.push_back(ValuePtr(new tstring(DEFAULT)));
+					}
+
+					*values[p] = value;
+				}
 
 				// For each tool...
 				XML::XPathIterator toolIter(TXT("Tool"), configNode);
@@ -206,8 +240,6 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 						{
 //							const tstring& config = configIter->first;
 							Values&        values = configIter->second;
-
-							ASSERT(*values[index] == DEFAULT);
 
 							values[index].Reset();
 						}
