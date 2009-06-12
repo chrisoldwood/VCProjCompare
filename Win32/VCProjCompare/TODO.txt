@@ -6,4 +6,6 @@
 
 - Sorting of results.
 
-- Showing files which have setting overrides
+- Showing project files which have setting overrides, e.g. stdafx.cpp.
+
+- Change project handling as a project can can generate a LIB and DLL.
