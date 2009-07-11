@@ -69,7 +69,7 @@ bool TheApp::OnOpen()
 	}
 	catch (const Core::Exception& e)
 	{
-		FatalMsg(TXT("Failed to configure the application:-\n\n%s"), e.What());
+		FatalMsg(TXT("Failed to configure the application:-\n\n%s"), e.twhat());
 		return false;
 	}
 	
@@ -101,7 +101,7 @@ bool TheApp::OnClose()
 	}
 	catch (const Core::Exception& e)
 	{
-		FatalMsg(TXT("Failed to save the application configuration:-\n\n%s"), e.What());
+		FatalMsg(TXT("Failed to save the application configuration:-\n\n%s"), e.twhat());
 		return false;
 	}
 
@@ -120,7 +120,7 @@ void TheApp::loadConfig()
 	tstring version = appConfig.readString(appConfig.DEFAULT_SECTION, TXT("Version"), CONFIG_VERSION);
 
 	if (version != CONFIG_VERSION)
-		throw Core::ConfigurationException(Core::Fmt(TXT("The configuration data is incompatible - '%s'"), version.c_str()));
+		throw Core::ConfigurationException(Core::fmt(TXT("The configuration data is incompatible - '%s'"), version.c_str()));
 
 	// Read the UI settings.
 	m_lastWndPos = appConfig.readValue<CRect>(TXT("UI"), TXT("MainWindow"), m_lastWndPos);
@@ -133,7 +133,7 @@ void TheApp::loadConfig()
 
 	for (size_t i = 0; i != max; ++i)
 	{
-		tstring entry = Core::Fmt(TXT("%u"), i);
+		tstring entry = Core::fmt(TXT("%u"), i);
 
 		WCL::AppConfig::StringArray values;
 		appConfig.readList(TXT("Project Dependent"), entry, TXT(""), values);
@@ -147,7 +147,7 @@ void TheApp::loadConfig()
 	// Read the build dependent settings list.
 	for (size_t i = 0; i != max; ++i)
 	{
-		tstring entry = Core::Fmt(TXT("%u"), i);
+		tstring entry = Core::fmt(TXT("%u"), i);
 
 		WCL::AppConfig::StringArray values;
 		appConfig.readList(TXT("Build Dependent"), entry, TXT(""), values);
@@ -187,7 +187,7 @@ void TheApp::saveConfig()
 		{
 			const ToolSetting& toolSetting = *it;
 
-			tstring entry = Core::Fmt(TXT("%u"), i);
+			tstring entry = Core::fmt(TXT("%u"), i);
 			tstring value = toolSetting.m_tool + TXT(",") + toolSetting.m_setting;
 
 			appConfig.writeString(TXT("Project Dependent"), entry, value);
@@ -205,7 +205,7 @@ void TheApp::saveConfig()
 		{
 			const ToolSetting& toolSetting = *it;
 
-			tstring entry = Core::Fmt(TXT("%u"), i);
+			tstring entry = Core::fmt(TXT("%u"), i);
 			tstring value = toolSetting.m_tool + TXT(",") + toolSetting.m_setting;
 
 			appConfig.writeString(TXT("Build Dependent"), entry, value);

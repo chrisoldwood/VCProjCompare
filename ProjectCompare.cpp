@@ -49,7 +49,7 @@ bool findProjectFiles(const tstring& folder, FileList& files)
 	}
 	catch (const Core::Exception& e)
 	{
-		g_app.FatalMsg(TXT("Failed searching for project files under:-\n\n%s\n\n%s"), folder.c_str(), e.What());
+		g_app.FatalMsg(TXT("Failed searching for project files under:-\n\n%s\n\n%s"), folder.c_str(), e.twhat());
 		return false;
 	}
 
@@ -69,11 +69,11 @@ bool readProjectFiles(Projects& projects)
 		try
 		{
 			tstring xml      = CFile::ReadTextFile(project.m_pathName.c_str());
-			project.m_xmlDoc = XML::Reader().ReadDocument(xml);
+			project.m_xmlDoc = XML::Reader().readDocument(xml);
 		}
 		catch (const Core::Exception& e)
 		{
-			g_app.FatalMsg(TXT("Failed to read project file:-\n\n%s\n\n%s"), project.m_pathName.c_str(), e.What());
+			g_app.FatalMsg(TXT("Failed to read project file:-\n\n%s\n\n%s"), project.m_pathName.c_str(), e.twhat());
 			return false;
 		}
 	}
@@ -100,13 +100,13 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 
 		try
 		{
-			XML::ElementNodePtr projectNode = project.m_xmlDoc->GetRootElement();
+			XML::ElementNodePtr projectNode = project.m_xmlDoc->getRootElement();
 
-			if ((projectNode.Get() == nullptr) || (projectNode->Name() != TXT("VisualStudioProject")))
+			if ((projectNode.get() == nullptr) || (projectNode->name() != TXT("VisualStudioProject")))
 				throw Core::ParseException(TXT("Failed to locate the <VisualStudioProject> node"));
 
 			// Extract key.
-			tstring projectName = projectNode->GetAttributes().Get(TXT("Name"))->Value();
+			tstring projectName = projectNode->getAttributes().get(TXT("Name"))->value();
 
 			// For each configuration...
 			XML::XPathIterator configIter(TXT("Configurations/Configuration"), projectNode);
@@ -116,26 +116,26 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 			{
 				XML::ElementNodePtr configNode = Core::dynamic_ptr_cast<XML::ElementNode>(*configIter);
 
-				ASSERT(configNode.Get() != nullptr);
+				ASSERT(configNode.get() != nullptr);
 
-				const XML::Attributes& configAttribs = configNode->GetAttributes();
+				const XML::Attributes& configAttribs = configNode->getAttributes();
 
 				// Extract key.
-				tstring configName = configAttribs.Get(TXT("Name"))->Value();
-				tstring configType = configAttribs.Get(TXT("ConfigurationType"))->Value();
+				tstring configName = configAttribs.get(TXT("Name"))->value();
+				tstring configType = configAttribs.get(TXT("ConfigurationType"))->value();
 
 				if (configType == TXT("4"))
 					libProjects.insert(p);
 
 				// For each configuration attribute...
-				XML::Attributes::const_iterator attribsIter = configAttribs.Begin();
-				XML::Attributes::const_iterator attribsEnd  = configAttribs.End();
+				XML::Attributes::const_iterator attribsIter = configAttribs.begin();
+				XML::Attributes::const_iterator attribsEnd  = configAttribs.end();
 
 				for (;attribsIter != attribsEnd; ++attribsIter)
 				{
 					const XML::AttributePtr& attrib  = *attribsIter;
-					const tstring&           setting = attrib->Name();
-					const tstring&           value   = attrib->Value();
+					const tstring&           setting = attrib->name();
+					const tstring&           value   = attrib->value();
 
 					// Ignore 'Name' as it's already the 'Build' subkey.
 					if (setting == TXT("Name"))
@@ -167,26 +167,26 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 				{
 					XML::ElementNodePtr toolNode = Core::dynamic_ptr_cast<XML::ElementNode>(*toolIter);
 
-					ASSERT(toolNode.Get() != nullptr);
+					ASSERT(toolNode.get() != nullptr);
 
 					// Find/Create tool subkey.
-					tstring         toolName       = toolNode->GetAttributes().Get(TXT("Name"))->Value();
+					tstring         toolName       = toolNode->getAttributes().get(TXT("Name"))->value();
 					ConfigSettings& configSettings = settings[toolName];
 
 					// For each tool setting...
-					XML::Attributes::const_iterator settingIter = toolNode->GetAttributes().Begin();
-					XML::Attributes::const_iterator settingEnd  = toolNode->GetAttributes().End();
+					XML::Attributes::const_iterator settingIter = toolNode->getAttributes().begin();
+					XML::Attributes::const_iterator settingEnd  = toolNode->getAttributes().end();
 
 					for (;settingIter != settingEnd; ++settingIter)
 					{
 						const XML::AttributePtr& attribute = *settingIter;
 
 						// Skip tool name.
-						if (attribute->Name() == TXT("Name"))
+						if (attribute->name() == TXT("Name"))
 							continue;
 
-						tstring setting = attribute->Name();
-						tstring value   = attribute->Value();
+						tstring setting = attribute->name();
+						tstring value   = attribute->value();
 
 						// Find/Create setting subkeys.
 						ConfigValues& configValues = configSettings[setting];
@@ -206,7 +206,7 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 		}
 		catch (const Core::Exception& e)
 		{
-			g_app.FatalMsg(TXT("Failed to parse project file:-\n\n%s\n\n%s"), project.m_fileName.c_str(), e.What());
+			g_app.FatalMsg(TXT("Failed to parse project file:-\n\n%s\n\n%s"), project.m_fileName.c_str(), e.twhat());
 			return false;
 		}
 	}
@@ -241,7 +241,7 @@ bool parseProjectFiles(const Projects& projects, ProjectSettings& settings)
 //							const tstring& config = configIter->first;
 							Values&        values = configIter->second;
 
-							values[index].Reset();
+							values[index].reset();
 						}
 					}
 				}
@@ -279,7 +279,7 @@ void listSettings(const Projects& projects, const ProjectSettings& settings, Tab
 				for (size_t i = 0; i < projects.size(); ++i)
 				{
 					// Ignore settings that are not applicable.
-					if (values[i].Get() == nullptr)
+					if (values[i].get() == nullptr)
 						continue;
 
 					const tstring& project = projects[i].m_fileName;
@@ -374,7 +374,7 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 					{
 						const ValuePtr& value = *itValue;
 
-						if (value.Get() != nullptr)
+						if (value.get() != nullptr)
 							configValueCounts[config][*value]++;
 					}
 				}
@@ -411,7 +411,7 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 					for (size_t i = 0; i < projects.size(); ++i)
 					{
 						// Ignore settings that are not applicable.
-						if (values[i].Get() == nullptr)
+						if (values[i].get() == nullptr)
 							continue;
 
 						const tstring& project = projects[i].m_fileName;
@@ -448,7 +448,7 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 					{
 						const ValuePtr& value = *valueIter;
 
-						if (value.Get() != nullptr)
+						if (value.get() != nullptr)
 							valueCounts[*value]++;
 					}
 				}
@@ -482,7 +482,7 @@ void compareSettings(const Projects& projects, const ProjectSettings& settings, 
 					for (size_t i = 0; i < projects.size(); ++i)
 					{
 						// Ignore settings that are not applicable.
-						if (values[i].Get() == nullptr)
+						if (values[i].get() == nullptr)
 							continue;
 
 						const tstring& project = projects[i].m_fileName;
