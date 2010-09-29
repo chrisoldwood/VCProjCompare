@@ -77,7 +77,7 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&Contents\tF1",               901
+        MENUITEM "&Contents\tF1",               ID_HELP_CONTENTS
         MENUITEM SEPARATOR
         MENUITEM "&About VC++ Project Compare", ID_HELP_ABOUT
     END
