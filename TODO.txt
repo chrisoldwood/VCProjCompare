@@ -9,3 +9,5 @@
 - Showing project files which have setting overrides, e.g. stdafx.cpp.
 
 - Change project handling as a project can can generate a LIB and DLL.
+
+- Inter-project mode for comparing in a single file.
