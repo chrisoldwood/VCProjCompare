@@ -11,3 +11,5 @@
 - Change project handling as a project can can generate a LIB and DLL.
 
 - Inter-project mode for comparing in a single file.
+
+- After comparison, list settings, cancel, then refresh - it forgets the old project list.
