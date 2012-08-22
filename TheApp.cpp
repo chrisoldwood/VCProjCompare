@@ -32,6 +32,8 @@ const tchar* CONFIG_VERSION = TXT("1.0");
 
 TheApp::TheApp()
 	: CApp(m_appWnd, m_appCmds)
+	, m_appWnd()
+	, m_appCmds(m_appWnd)
 	, m_modified(0)
 	, m_lastFolder()
 	, m_lastFile1()
@@ -78,7 +80,7 @@ bool TheApp::OnOpen()
 		return false;
 
 	// Show it.
-	if (ShowNormal() && !m_lastWndPos.Empty())
+	if (!m_lastWndPos.Empty())
 		m_appWnd.Move(m_lastWndPos);
 
 	m_appWnd.Show(m_iCmdShow);

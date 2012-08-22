@@ -15,7 +15,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //! Constructor.
 
-AppCmds::AppCmds()
+AppCmds::AppCmds(AppWnd& appWnd)
+	: CCmdControl(appWnd)
 {
 	// Define the command table.
 	DEFINE_CMD_TABLE
