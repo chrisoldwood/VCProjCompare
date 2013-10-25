@@ -4,10 +4,6 @@
 	Version="7.10"
 	Name="VCProjCompare"
 	ProjectGUID="{AD1E45B4-FFA1-404E-A559-1F4C5E18462B}"
-	SccProjectName="SAK"
-	SccAuxPath="SAK"
-	SccLocalPath="SAK"
-	SccProvider="SAK"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
