@@ -138,7 +138,7 @@ void TheApp::loadConfig()
 		tstring entry = Core::fmt(TXT("%u"), i);
 
 		WCL::AppConfig::StringArray values;
-		appConfig.readList(TXT("Project Dependent"), entry, TXT(""), values);
+		appConfig.readStringList(TXT("Project Dependent"), entry, TXT(""), values);
 
 		if (values.size() != 2)
 			break;
@@ -152,7 +152,7 @@ void TheApp::loadConfig()
 		tstring entry = Core::fmt(TXT("%u"), i);
 
 		WCL::AppConfig::StringArray values;
-		appConfig.readList(TXT("Build Dependent"), entry, TXT(""), values);
+		appConfig.readStringList(TXT("Build Dependent"), entry, TXT(""), values);
 
 		if (values.size() != 2)
 			break;
