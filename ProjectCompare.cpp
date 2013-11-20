@@ -69,7 +69,7 @@ bool readProjectFiles(Projects& projects)
 		try
 		{
 			tstring xml      = CFile::ReadTextFile(project.m_pathName.c_str());
-			project.m_xmlDoc = XML::Reader().readDocument(xml);
+			project.m_xmlDoc = XML::Reader::readDocument(xml);
 		}
 		catch (const Core::Exception& e)
 		{
