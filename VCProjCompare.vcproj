@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="VCProjCompare"
 	ProjectGUID="{AD1E45B4-FFA1-404E-A559-1F4C5E18462B}"
+	RootNamespace="VCProjCompare"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -63,6 +64,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
 				AdditionalIncludeDirectories="../Lib"
 			/>
 			<Tool
@@ -143,6 +145,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
 				AdditionalIncludeDirectories="../Lib"
 			/>
 			<Tool
@@ -184,12 +187,15 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{790BC113-52FB-4565-8968-79B8B011C520}"
+			RelativePathToProject="..\Lib\Core\Core.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{9B0335B6-93BE-4604-8497-27431874D758}"
+			RelativePathToProject="..\Lib\WCL\Wcl.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{2BF56C15-FDAD-480B-9C25-951E43773ED6}"
+			RelativePathToProject="..\Lib\XML\XML.vcproj"
 		/>
 	</References>
 	<Files>
