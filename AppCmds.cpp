@@ -21,15 +21,15 @@ AppCmds::AppCmds(AppWnd& appWnd)
 	// Define the command table.
 	DEFINE_CMD_TABLE
 		// File menu.
-		CMD_ENTRY(ID_FILE_LIST,		&AppCmds::onFileList,		NULL,	-1)
-		CMD_ENTRY(ID_FILE_COMPARE,	&AppCmds::onFileCompare,	NULL,	-1)
-		CMD_ENTRY(ID_FILE_REFRESH,	&AppCmds::onFileRefresh,	NULL,	-1)
-		CMD_ENTRY(ID_FILE_EXIT,		&AppCmds::onFileExit,		NULL,	-1)
+		CMD_ENTRY(ID_FILE_LIST,		&AppCmds::onFileList,		nullptr,	-1)
+		CMD_ENTRY(ID_FILE_COMPARE,	&AppCmds::onFileCompare,	nullptr,	-1)
+		CMD_ENTRY(ID_FILE_REFRESH,	&AppCmds::onFileRefresh,	nullptr,	-1)
+		CMD_ENTRY(ID_FILE_EXIT,		&AppCmds::onFileExit,		nullptr,	-1)
 		// Tools menu.
-		CMD_ENTRY(ID_TOOLS_OPTIONS,	&AppCmds::onToolsOptions,	NULL,	-1)
+		CMD_ENTRY(ID_TOOLS_OPTIONS,	&AppCmds::onToolsOptions,	nullptr,	-1)
 		// Help menu.
-		CMD_ENTRY(ID_HELP_CONTENTS,	&AppCmds::onHelpContents,	NULL,	-1)
-		CMD_ENTRY(ID_HELP_ABOUT,	&AppCmds::onHelpAbout,		NULL,	-1)
+		CMD_ENTRY(ID_HELP_CONTENTS,	&AppCmds::onHelpContents,	nullptr,	-1)
+		CMD_ENTRY(ID_HELP_ABOUT,	&AppCmds::onHelpAbout,		nullptr,	-1)
 	END_CMD_TABLE
 }
 
@@ -139,7 +139,7 @@ void AppCmds::onHelpContents()
 {
 	CBusyCursor busyCursor;
 
-	::ShellExecute(NULL, NULL, CPath::ApplicationDir() / TXT("VCProjCompare.mht"), NULL, NULL, SW_SHOW);
+	::ShellExecute(nullptr, nullptr, CPath::ApplicationDir() / TXT("VCProjCompare.mht"), nullptr, nullptr, SW_SHOW);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
